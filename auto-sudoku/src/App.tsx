@@ -1,68 +1,8 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useCallback, useRef, useState } from 'react'
 import './App.scss'
 import Processor from './augmentedReality/Processor';
-import Image from './augmentedReality/imageProcessing/Image';
 import { PuzzleBox } from './augmentedReality/imageProcessing/extractBoxes';
-import { row } from 'mathjs';
 const processor = new Processor();
-
-const drawImage = (image: HTMLImageElement, thresholded: Image, context: CanvasRenderingContext2D) => {
-  const byteArray = thresholded!.bytes;
-  const width = image.width;  // Example width (you can change it)
-  const height = image.height; // Example height (you can change it)
-
-  // Ensure that your byte array has the correct size for the canvas
-  // The byte array should contain width * height values for a grayscale image
-  if (byteArray.length !== width * height) {
-    console.error("Byte array size does not match canvas dimensions!");
-  }
-
-  const imageData = context.createImageData(width, height);
-
-  // Loop through each pixel and set the RGBA values
-  for (let i = 0; i < byteArray.length; i++) {
-    const grayscaleValue = byteArray[i];
-    const pixelIndex = i * 4; // Each pixel has 4 values (R, G, B, A)
-
-    // Set the red, green, blue, and alpha channels
-    imageData.data[pixelIndex] = grayscaleValue;     // Red
-    imageData.data[pixelIndex + 1] = grayscaleValue; // Green
-    imageData.data[pixelIndex + 2] = grayscaleValue; // Blue
-    imageData.data[pixelIndex + 3] = 255;           // Alpha (fully opaque)
-  }
-
-  // Put the image data onto the canvas
-  context.putImageData(imageData, 0, 0);
-}
-
-const drawExtractedImage = (image: Image, context: CanvasRenderingContext2D) => {
-  const byteArray = image!.bytes;
-  const width = 900;  // Example width (you can change it)
-  const height = 900; // Example height (you can change it)
-
-  // Ensure that your byte array has the correct size for the canvas
-  // The byte array should contain width * height values for a grayscale image
-  if (byteArray.length !== width * height) {
-    console.error("Byte array size does not match canvas dimensions!");
-  }
-
-  const imageData = context.createImageData(width, height);
-
-  // Loop through each pixel and set the RGBA values
-  for (let i = 0; i < byteArray.length; i++) {
-    const grayscaleValue = byteArray[i];
-    const pixelIndex = i * 4; // Each pixel has 4 values (R, G, B, A)
-
-    // Set the red, green, blue, and alpha channels
-    imageData.data[pixelIndex] = grayscaleValue;     // Red
-    imageData.data[pixelIndex + 1] = grayscaleValue; // Green
-    imageData.data[pixelIndex + 2] = grayscaleValue; // Blue
-    imageData.data[pixelIndex + 3] = 255;           // Alpha (fully opaque)
-  }
-
-  // Put the image data onto the canvas
-  context.putImageData(imageData, 0, 0);
-}
 
 function App() {
   const [image, setImage] = useState<string>();

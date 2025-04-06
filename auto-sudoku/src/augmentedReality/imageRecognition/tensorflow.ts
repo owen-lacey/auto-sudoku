@@ -16,7 +16,7 @@ async function loadModel() {
   if (modelLoadingPromise) {
     return modelLoadingPromise;
   }
-  modelLoadingPromise = new Promise(async (resolve, reject) => {
+  modelLoadingPromise = new Promise(async (resolve) => {
     await tf.setBackend("wasm");
     _model = await tf.loadLayersModel(MODEL_URL);
     resolve(_model);
