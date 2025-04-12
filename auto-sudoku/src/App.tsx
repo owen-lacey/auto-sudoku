@@ -1,93 +1,45 @@
-import { ChangeEvent, useCallback, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import './App.scss'
-import Processor from './augmentedReality/Processor';
-import { PuzzleBox } from './augmentedReality/imageProcessing/extractBoxes';
-const processor = new Processor();
+import GetPhoto from './components/GetPhoto';
+import DrawSudoku from './components/DrawSudoku';
+import SolveSudoku from './components/SolveSudoku';
+
+declare type AutoSudokuStep = 'GetPhoto' | 'DrawSudoku' | 'SolveSudoku';
 
 function App() {
+  const [step, setStep] = useState<AutoSudokuStep>('GetPhoto')
   const [image, setImage] = useState<string>();
-  const imageRef = useRef<HTMLImageElement>(null);
-  const [puzzleBoxes, setPuzzleBoxes] = useState<PuzzleBox[]>([])
+  const [digits, setDigits] = useState<(number | null)[][]>([]);
 
-  const onFileChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setImage(file ? URL.createObjectURL(file) : undefined);
-  }, []);
-
-  const processImage = useCallback(async () => {
-    if (imageRef.current) {
-      (await processor.processFrame(imageRef.current))!;
-      if (processor.boxes) {
-        setPuzzleBoxes(processor.boxes);
-      }
+  useEffect(() => {
+    if (image && image.length > 0) {
+      setStep('DrawSudoku');
     }
-  }, [imageRef.current]);
+  }, [image])
 
-  const solveSudoku = useCallback(() => {
-    let rows = [];
-    for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
-      let row: (number | null)[] = [];
-      for (let colIndex = 0; colIndex < 9; colIndex++) {
-        const detectedDigit = puzzleBoxes.find(pb => pb.y === rowIndex && pb.x == colIndex);
-        row.push(detectedDigit?.contents || null);
-      }
-      rows.push(row);
-    }
-    const body = JSON.stringify(rows);
-    fetch(import.meta.env.VITE_APP_SOLVE_ENDPOINT, { method: 'post', body: body })
-      .then(res => console.log(res.json()));
-  }, [puzzleBoxes]);
+  const onReadyToSolve = (digits: (number | null)[][]) => {
+    setDigits(digits);
+    setStep('SolveSudoku');
+  };
 
-  let detectedSudoku = <></>
-  if (puzzleBoxes.length > 0) {
-    let rows = [];
-    for (let rowIndex = 0; rowIndex < 9; rowIndex++) {
-      let row = [];
-      for (let colIndex = 0; colIndex < 9; colIndex++) {
-        const detectedDigit = puzzleBoxes.find(pb => pb.y === rowIndex && pb.x == colIndex);
-        row.push(<td key={`td-${rowIndex}-${colIndex}`} className={`border text-xl [&:nth-child(3n):not(:last-child)]:border-r-4`}>{detectedDigit?.contents}</td>);
-      }
-      rows.push(row);
-    }
-
-    detectedSudoku = <table className='h-[300px] w-[300px] border-4'>
-      <tbody>
-        {rows.map((r, i) => {
-          return <tr key={i} className='[&:nth-child(3n):not(:last-child)]:border-b-4'>
-            {r}
-          </tr>;
-        })}
-      </tbody>
-    </table>;
+  let content = <></>;
+  switch (step) {
+    case 'GetPhoto':
+      content = <GetPhoto setImage={setImage} />;
+      break;
+    case 'DrawSudoku':
+      content = <DrawSudoku image={image!} onReadyToSolve={onReadyToSolve} />
+      break;
+    case 'SolveSudoku':
+      content = <SolveSudoku existingDigits={digits} />
+      break;
   }
 
-  return (
-    <>
-      <input
-        type='file'
-        accept='image/*'
-        onChange={onFileChanged}
-      />
-      <div className="">
-
-        <div className='flex flex-col'>
-          {image &&
-            <>
-              <div className='flex gap-4 items-center'>
-                <div className='flex-1 flex items-center justify-center'>
-                  <img className='w-[300px]' ref={imageRef} src={image} onLoad={processImage} />
-                </div>
-                <div className='flex-1'>
-                  {detectedSudoku}
-                </div>
-              </div>
-              {puzzleBoxes.length > 0 && <button onClick={solveSudoku}>Solve</button>}
-            </>
-          }
-
-        </div>
-      </div>
-    </>
+  return (<>
+    <div className='h-screen flex flex-col w-screen max-w-[600px] p-4'>
+      {content}
+    </div>
+  </>
   )
 }
 

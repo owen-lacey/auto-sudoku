@@ -16,6 +16,7 @@
     "mathjs": "^14.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-webcam": "^7.2.0",
     "tailwindcss": "^4.0.17",
     "vite-plugin-wasm": "^3.4.1"
   },

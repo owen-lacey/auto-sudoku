@@ -22,7 +22,7 @@ async function loadModel() {
     resolve(_model);
   });
 }
-loadModel().then(() => console.log("Model Loaded", console.error));
+loadModel().then(() => console.log("Model Loaded"));
 
 /**
  * Work out what the class should be from the results of the neural network prediction
@@ -33,6 +33,7 @@ export async function getClasses(logits: tf.Tensor<tf.Rank>) {
   const classes = logitsArray.map((values) => {
     let maxProb = 0;
     let maxIndex = 0;
+
     values.forEach((value, index) => {
       if (value > maxProb) {
         maxProb = value;
