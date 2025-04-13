@@ -26,7 +26,7 @@ function GetPhoto({ setImage }: { setImage: (src: string | undefined) => void })
       <Webcam
         ref={cameraRef}
         videoConstraints={videoConstraints}
-        className='w-auto' />
+        className='w-auto  h-full' />
     </div>
     <div className='flex gap-4'>
       <input
