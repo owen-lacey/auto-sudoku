@@ -42,7 +42,7 @@ function App() {
       content = <DrawSudoku image={image!} onReadyToSolve={onReadyToSolve} onTryAgain={reset} />
       break;
     case 'SolveSudoku':
-      content = <SolveSudoku existingDigits={digits} />
+      content = <SolveSudoku existingDigits={digits} onBackClicked={reset} />
       break;
   }
 

@@ -1,13 +1,19 @@
 import { useCallback, useState } from "react";
+import { ArrowLeftIcon } from "@heroicons/react/24/outline";
 
-function SolveSudoku({ existingDigits }: { existingDigits: (number | null)[][] }) {
+function SolveSudoku({ existingDigits, onBackClicked }: { existingDigits: (number | null)[][], onBackClicked: () => void }) {
   const [solvedDigits, setSolvedDigits] = useState<number[][] | null>(null);
+  const [solved, setSolved] = useState(false);
+  const [solving, setSolving] = useState(false);
 
   const solveSudoku = async () => {
+    setSolving(true);
     const body = JSON.stringify(existingDigits);
     const response = await fetch(import.meta.env.VITE_APP_SOLVE_ENDPOINT, { method: 'post', body: body });
     const result = await response.json() as number[][];
     setSolvedDigits(result);
+    setSolved(true);
+    // setSolving(false);
   }
 
   const onSolveClicked = useCallback(() => {
@@ -41,13 +47,21 @@ function SolveSudoku({ existingDigits }: { existingDigits: (number | null)[][] }
     rows.push(tds);
   }
   return <div className='flex-1 flex flex-col'>
+    <h3 className="font-mono">{!solved ? solving ? 'Solving...' : 'Ready to solve' : 'Solution found'}</h3>
     <div className="flex-1 flex items-center justify-center">
       <table className={`border border-t-4 border-l-4 transition duration-1000`}>
         <tbody>{rows.map((r, i) => <tr className='nth-[3n]:border-b-4' key={i}>{r}</tr>)}</tbody>
       </table>
     </div>
-    <div>
-      <button className={`w-100 transition duration-1000`} onClick={onSolveClicked}>Solve</button>
+    <div className="flex gap-4">
+      {solved ?
+        <button className={`flex-1 transition duration-1000`} onClick={onBackClicked}>Again, again!</button>
+        :
+        <>
+          <button onClick={onBackClicked}><ArrowLeftIcon className="text-white size-6" /></button>
+          <button disabled={solving} className={`flex-1 transition duration-1000`} onClick={onSolveClicked}>Solve</button>
+        </>
+      }
     </div>
   </div>;
 }

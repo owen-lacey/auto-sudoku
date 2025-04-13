@@ -75,7 +75,7 @@ function DrawSudoku({ image, onReadyToSolve, onTryAgain }: { image: string, onRe
   }, [imageRef.current]);
 
   useEffect(() => {
-    if (imageRef.current) {
+    if (imageRef.current && imageRef.current!.width > 0) {
       setImageDims({ w: imageRef.current!.width, h: imageRef.current!.height })
     }
   }, [imageRef.current]);
@@ -138,6 +138,7 @@ function DrawSudoku({ image, onReadyToSolve, onTryAgain }: { image: string, onRe
       <div className='flex-1 flex items-center justify-center'>
         <div className={`relative flex items-center justify-center transition duration-1000 ${sudokuFound ? 'opacity-0' : ''}`}>
           <img
+            className="max-h-[90vh]"
             ref={imageRef}
             src={image}
             onLoad={processImage} />
