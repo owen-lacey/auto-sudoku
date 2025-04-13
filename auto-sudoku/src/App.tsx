@@ -22,13 +22,19 @@ function App() {
     setStep('SolveSudoku');
   };
 
+  const reset = () => {
+    setStep('GetPhoto');
+    setImage(undefined);
+    setDigits([]);
+  }
+
   let content = <></>;
   switch (step) {
     case 'GetPhoto':
       content = <GetPhoto setImage={setImage} />;
       break;
     case 'DrawSudoku':
-      content = <DrawSudoku image={image!} onReadyToSolve={onReadyToSolve} />
+      content = <DrawSudoku image={image!} onReadyToSolve={onReadyToSolve} onTryAgain={reset} />
       break;
     case 'SolveSudoku':
       content = <SolveSudoku existingDigits={digits} />

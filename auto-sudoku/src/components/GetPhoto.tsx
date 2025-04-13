@@ -10,11 +10,23 @@ function GetPhoto({ setImage }: { setImage: (src: string | undefined) => void })
     setImage(file ? URL.createObjectURL(file) : undefined);
   }, []);
 
-  return <>
+  const takePhoto = useCallback(() => {
+    if (cameraRef.current) {
+      const screenshot = cameraRef.current!.getScreenshot();
+      setImage(screenshot || undefined);
+    }
+  }, [cameraRef.current]);
+  const videoConstraints: MediaTrackConstraints = {
+    facingMode: { ideal: 'environment' }
+  };
+
+  return <div className='flex-1 flex flex-col'>
+    <h3 className="font-mono">Auto Sudoku</h3>
     <div className='flex-1'>
       <Webcam
         ref={cameraRef}
-        className='h-full w-auto' />
+        videoConstraints={videoConstraints}
+        className='w-auto' />
     </div>
     <div className='flex gap-4'>
       <input
@@ -24,10 +36,11 @@ function GetPhoto({ setImage }: { setImage: (src: string | undefined) => void })
         accept='image/*'
         onChange={onFileChanged}
       />
-      <button className='flex-1' onClick={() => { }}>Take photo</button>
+      <button className='flex-1' onClick={takePhoto}>Take photo</button>
       <button className='flex-1' onClick={() => imageInputRef.current!.click()}>Select photo</button>
 
-    </div></>;
+    </div>
+  </div>;
 }
 
 export default GetPhoto;
