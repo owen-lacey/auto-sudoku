@@ -74,7 +74,7 @@ export default class Processor {
 
       // apply adaptive thresholding to the image
       startTime = performance.now();
-      const thresholded = adaptiveThreshold(image.clone(), 8, 20);
+      const thresholded = adaptiveThreshold(image.clone(), 8, 10);
       this.thresholded = thresholded;
       this.thresholdTime =
         0.1 * (performance.now() - startTime) + this.thresholdTime * 0.9;
@@ -104,8 +104,8 @@ export default class Processor {
         this.cornerPointTime =
           0.1 * (performance.now() - startTime) + this.cornerPointTime * 0.9;
 
+        this.corners = potentialCorners;
         if (this.sanityCheckCorners(potentialCorners)) {
-          this.corners = potentialCorners;
 
           // compute the transform to go from a square puzzle of size PROCESSING_SIZE to the detected corner points
           startTime = performance.now();
@@ -149,13 +149,7 @@ export default class Processor {
           await fillInPrediction(boxes);
           this.neuralNetTime =
             0.1 * (performance.now() - startTime) + this.neuralNetTime * 0.9;
-        } else {
-          this.corners = null;
-          this.gridLines = null;
         }
-      } else {
-        this.corners = null;
-        this.gridLines = null;
       }
     } catch (error) {
       console.error(error);

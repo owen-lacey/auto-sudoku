@@ -77,10 +77,13 @@ function DrawSudoku({ image, onReadyToSolve }: { image: string, onReadyToSolve: 
 
   useEffect(() => {
     const context = canvasRef?.current?.getContext('2d');
-    if (context && puzzleBoxes.length && imageDims) {
+    if (context && imageDims) {
+
+      context.putImageData(processor.thresholded!.toImageData(), 0, 0);
+
       context.strokeStyle = "rgba(0,200,0,0.5)";
       context.lineWidth = 3;
-      if (processor.corners && processor.gridLines) {
+      if (processor.corners) {
         const points: Point[] = [];
         const {
           topLeft,
@@ -95,15 +98,20 @@ function DrawSudoku({ image, onReadyToSolve }: { image: string, onReadyToSolve: 
         points.push(topLeft);
 
         window.requestAnimationFrame(() => animate(1, calculateCanvasPath(points), context, () => {
-          setSudokuFound(true);
-          setTimeout(() => onReadyToSolve(getDigits(puzzleBoxes)), 1000);
+          if (puzzleBoxes.length > 0) {
+            setSudokuFound(true);
+            setTimeout(() => onReadyToSolve(getDigits(puzzleBoxes)), 1000);
+          }
         }));
-        processor.gridLines.forEach((line) => {
-          const points: Point[] = [];
-          points.push(line.p1);
-          points.push(line.p2);
-          window.requestAnimationFrame(() => animate(1, calculateCanvasPath(points), context, () => { }));
-        });
+        if (processor.gridLines) {
+
+          processor.gridLines.forEach((line) => {
+            const points: Point[] = [];
+            points.push(line.p1);
+            points.push(line.p2);
+            window.requestAnimationFrame(() => animate(1, calculateCanvasPath(points), context, () => { }));
+          });
+        }
       }
     }
   }, [puzzleBoxes, imageDims]);
