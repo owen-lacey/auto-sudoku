@@ -103,9 +103,9 @@ function DrawSudoku({ image, onReadyToSolve, onTryAgain }: { image: string, onRe
 
         window.requestAnimationFrame(() => animate(1, calculateCanvasPath(points), context, () => {
           if (puzzleBoxes.length > 0) {
-            // setSudokuFound(true);
-            // setProcessedImage(true);
-            // setTimeout(() => onReadyToSolve(getDigits(puzzleBoxes)), 1000);
+            setSudokuFound(true);
+            setProcessedImage(true);
+            setTimeout(() => onReadyToSolve(getDigits(puzzleBoxes)), 1000);
           }
         }));
         if (processor.gridLines) {
