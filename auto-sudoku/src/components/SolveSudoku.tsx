@@ -1,23 +1,29 @@
 import { useCallback, useState } from "react";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { solveSudoku } from "../solver/solveSudoku";
 
 function SolveSudoku({ existingDigits, onBackClicked }: { existingDigits: (number | null)[][], onBackClicked: () => void }) {
   const [solvedDigits, setSolvedDigits] = useState<number[][] | null>(null);
   const [solved, setSolved] = useState(false);
   const [solving, setSolving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const solveSudoku = async () => {
+  const runSolve = async () => {
     setSolving(true);
-    const body = JSON.stringify(existingDigits);
-    const response = await fetch(import.meta.env.VITE_APP_SOLVE_ENDPOINT, { method: 'post', body: body });
-    const result = await response.json() as number[][];
-    setSolvedDigits(result);
-    setSolved(true);
-    // setSolving(false);
+    setError(null);
+    try {
+      const result = await solveSudoku(existingDigits);
+      setSolvedDigits(result);
+      setSolved(true);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Solve failed');
+    } finally {
+      setSolving(false);
+    }
   }
 
   const onSolveClicked = useCallback(() => {
-    solveSudoku()
+    runSolve()
   }, [existingDigits])
 
   const rows: any[][] = [];
@@ -47,7 +53,7 @@ function SolveSudoku({ existingDigits, onBackClicked }: { existingDigits: (numbe
     rows.push(tds);
   }
   return <div className='flex-1 flex flex-col'>
-    <h3 className="font-mono">{!solved ? solving ? 'Solving...' : 'Ready to solve' : 'Solution found'}</h3>
+    <h3 className="font-mono">{error ? error : !solved ? solving ? 'Solving...' : 'Ready to solve' : 'Solution found'}</h3>
     <div className="flex-1 flex items-center justify-center">
       <table className={`border border-t-4 border-l-4 transition duration-1000`}>
         <tbody>{rows.map((r, i) => <tr className='nth-[3n]:border-b-4' key={i}>{r}</tr>)}</tbody>

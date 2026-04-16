@@ -15,6 +15,7 @@
     "@tailwindcss/vite": "^4.0.17",
     "@tensorflow/tfjs": "^4.22.0",
     "@tensorflow/tfjs-backend-wasm": "^4.22.0",
+    "cpsat-js": "^1.0.0",
     "mathjs": "^14.4.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
